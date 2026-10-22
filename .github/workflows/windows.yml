@@ -38,23 +38,21 @@ jobs:
           "tag=$tag" >> $env:GITHUB_OUTPUT
 
           git fetch --tags --force
-          $prevTag = git tag --sort=-creatordate | Select-Object -First 1
+          $prevTag = git tag --list "build-*" --sort=-creatordate | Select-Object -First 1
 
           $notesFile = "release-notes.md"
-          @(
-            "## Changes",
-            ""
-          ) | Set-Content $notesFile
+          Set-Content $notesFile "## Changes`n"
 
           if ($prevTag) {
-            Add-Content $notesFile "_Since $prevTag_"
-            Add-Content $notesFile ""
-            git log "$prevTag..HEAD" --pretty=format:"- %s (%h)"
+            Add-Content $notesFile "_Since $prevTag_`n"
+            $log = git log "$prevTag..HEAD" --pretty=format:"- %s (%h)"
           } else {
-            Add-Content $notesFile "_Initial build_"
-            Add-Content $notesFile ""
-            git log --pretty=format:"- %s (%h)"
-          } | Add-Content $notesFile
+            Add-Content $notesFile "_Initial build_`n"
+            $log = git log --pretty=format:"- %s (%h)"
+          }
+
+          if (-not $log) { $log = "- No commit messages found." }
+          Add-Content $notesFile $log
 
           "notes_file=$notesFile" >> $env:GITHUB_OUTPUT
 
