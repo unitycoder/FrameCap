@@ -36,23 +36,13 @@ Canceling Save keeps the completed recording in a temporary file for this sessio
 
 ## Build on Windows
 
-Install Visual Studio 2022/2026 or Build Tools with **Desktop development with C++**, including Windows SDK and CMake tools. Also install Git.
+Install Visual Studio 2026 or Build Tools with **Desktop development with C++**, including Windows SDK, CMake tools, and the vcpkg package manager component.
 
-Double-click `build.cmd`. The first build downloads vcpkg and builds libvpx, so it needs an Internet connection and can take several minutes. Subsequent builds reuse the dependencies. The output is `dist/FrameCap.exe`.
+Double-click `build.bat`. It configures and builds a Release x64 executable using the vcpkg bundled with Visual Studio. The first build needs an Internet connection for dependencies and can take several minutes. The output is `dist/FrameCap.exe`.
 
-Alternatively, in a Visual Studio developer terminal:
+The repository's `build.ps1` is used by the GitHub Actions workflow.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
-```
-
-To use an existing vcpkg checkout:
-
-```powershell
-.\build.ps1 -VcpkgRoot C:\dev\vcpkg
-```
-
-CMake uses the `x64-windows-static` triplet and a static MSVC runtime. GitHub Actions configuration is included for an optional Windows build. No repository or workflow has been created or run on your behalf.
+CMake uses the `x64-windows-static` triplet and a static MSVC runtime. GitHub Actions configuration is included for an optional Windows build.
 
 ## Implementation
 

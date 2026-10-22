@@ -298,7 +298,7 @@ LRESULT CALLBACK procedure(HWND h, UINT msg, WPARAM w, LPARAM l) {
         FillRect(dc, &r, background); SelectObject(dc, font); SetBkMode(dc, TRANSPARENT);
         SetTextColor(dc, RGB(232, 238, 248));
          RECT title{px(14), px(7), r.right-px(70), px(31)};
-        DrawTextW(dc, L"FrameCap  /  WebM recorder", -1, &title, DT_SINGLELINE | DT_VCENTER);
+        DrawTextW(dc, L"FrameCap", -1, &title, DT_SINGLELINE | DT_VCENTER);
          SetTextColor(dc, state == State::Recording || state == State::Stopping ? RGB(100, 105, 115) : RGB(232, 238, 248));
          RECT minimize{r.right-px(70), px(7), r.right-px(35), px(31)}; DrawTextW(dc, L"_", -1, &minimize, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
          RECT close{r.right-px(35), px(7), r.right-px(9), px(31)}; DrawTextW(dc, L"X", -1, &close, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
