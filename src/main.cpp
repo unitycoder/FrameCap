@@ -91,7 +91,11 @@ bool saveRecording() {
         message(L"Could not save the file (Windows error " + std::to_wstring(GetLastError()) + L"). Your recording is still available.");
         return false;
     }
-    DeleteFileW(temporary.c_str()); temporary.clear(); state = State::Ready;
+    if (!DeleteFileW(temporary.c_str())) {
+        message(L"The recording was saved, but its temporary copy could not be removed (Windows error " + std::to_wstring(GetLastError()) + L"). Use Discard to try again.");
+        return false;
+    }
+    temporary.clear(); state = State::Ready;
     notice = L"Saved"; updateControls();
     std::wstring arguments = L"/select,\"" + std::wstring(name) + L"\"";
     ShellExecuteW(nullptr, L"open", L"explorer.exe", arguments.c_str(), nullptr, SW_SHOWNORMAL);
@@ -180,7 +184,12 @@ void begin() {
     temporary = name; stop = false; frameCount = 0; workerError.clear(); notice.clear();
     state = State::Recording; started = std::chrono::steady_clock::now(); updateControls();
     try { worker = std::thread(record, r, int(fps), SendMessageW(cursorBox, BM_GETCHECK, 0, 0) == BST_CHECKED, temporary); }
-    catch (...) { DeleteFileW(temporary.c_str()); temporary.clear(); state = State::Ready; updateControls(); message(L"Could not start the recording thread."); }
+    catch (...) {
+        std::wstring failure = L"Could not start the recording thread.";
+        if (!DeleteFileW(temporary.c_str()))
+            failure += L" The temporary file could not be removed (Windows error " + std::to_wstring(GetLastError()) + L").";
+        temporary.clear(); state = State::Ready; updateControls(); message(failure);
+    }
 }
 void toggle() {
     if (state == State::Ready) begin();
@@ -193,7 +202,11 @@ bool confirmDiscard() {
 }
 void discard() {
     if (!confirmDiscard()) return;
-    DeleteFileW(temporary.c_str()); temporary.clear(); state = State::Ready; notice.clear(); updateControls();
+    if (!DeleteFileW(temporary.c_str())) {
+        message(L"Could not remove the temporary recording (Windows error " + std::to_wstring(GetLastError()) + L").");
+        return;
+    }
+    temporary.clear(); state = State::Ready; notice.clear(); updateControls();
 }
 void closeWindow() {
     if (state == State::Stopping) return;
@@ -202,7 +215,13 @@ void closeWindow() {
         ModalGuard guard;
         int answer = MessageBoxW(window, L"Save your recording before closing?", L"FrameCap", MB_YESNOCANCEL | MB_ICONQUESTION);
         if (answer == IDCANCEL || (answer == IDYES && !saveRecording())) return;
-        if (answer == IDNO) { DeleteFileW(temporary.c_str()); temporary.clear(); }
+        if (answer == IDNO) {
+            if (!DeleteFileW(temporary.c_str())) {
+                message(L"Could not remove the temporary recording (Windows error " + std::to_wstring(GetLastError()) + L").");
+                return;
+            }
+            temporary.clear();
+        }
     }
     DestroyWindow(window);
 }
@@ -279,8 +298,11 @@ LRESULT CALLBACK procedure(HWND h, UINT msg, WPARAM w, LPARAM l) {
     case Done:
         if (worker.joinable()) worker.join();
         if (!workerError.empty()) {
-            state = State::Ready; DeleteFileW(temporary.c_str()); temporary.clear();
-            message(L"Recording failed: " + workerError); closeAfter = false;
+            std::wstring failure = L"Recording failed: " + workerError;
+            if (!DeleteFileW(temporary.c_str()))
+                failure += L" The temporary file could not be removed (Windows error " + std::to_wstring(GetLastError()) + L").";
+            state = State::Ready; temporary.clear();
+            message(failure); closeAfter = false;
         } else {
             state = State::Pending; notice = L"Unsaved recording"; updateControls();
             bool saved = saveRecording();
@@ -330,7 +352,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int show) {
     background = CreateSolidBrush(RGB(27, 31, 40));
     WNDCLASSEXW cls{}; cls.cbSize = sizeof(cls); cls.lpfnWndProc = procedure; cls.hInstance = instance;
     cls.lpszClassName = L"FrameCap.Main"; cls.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    cls.hIcon = LoadIconW(nullptr, IDI_APPLICATION); cls.hbrBackground = background;
+    cls.hIcon = cls.hIconSm = LoadIconW(instance, MAKEINTRESOURCEW(101)); cls.hbrBackground = background;
     if (!RegisterClassExW(&cls)) return 1;
     HWND h = CreateWindowExW(WS_EX_TOPMOST, cls.lpszClassName, L"FrameCap", WS_POPUP | WS_THICKFRAME | WS_CLIPCHILDREN,
                              CW_USEDEFAULT, CW_USEDEFAULT, MulDiv(820, int(GetDpiForSystem()), 96), MulDiv(560, int(GetDpiForSystem()), 96), nullptr, nullptr, instance, nullptr);

@@ -50,6 +50,8 @@ class Writer {
     }
 public:
     Writer(const std::filesystem::path& path, unsigned width, unsigned height, unsigned fps) {
+        if (path.empty() || width == 0 || height == 0 || fps == 0)
+            throw std::invalid_argument("Invalid WebM output parameters");
         file.exceptions(std::ios::badbit | std::ios::failbit);
         file.open(path, std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
         Bytes ebml;
@@ -76,6 +78,7 @@ public:
         write(element(0x1654ae6b, element(0xae, track)));
     }
     void frame(const uint8_t* data, size_t length, uint64_t milliseconds, bool key) {
+        if (!data || length == 0) throw std::invalid_argument("Empty video frame");
         if (frames && milliseconds <= lastTime) throw std::runtime_error("Non-increasing WebM timestamp");
         uint64_t clusterPos = pos() - segmentStart;
         Bytes block{0x81, 0, 0, uint8_t(key ? 0x80 : 0)};
@@ -103,5 +106,7 @@ public:
         Bytes length; size(length, end - segmentStart, 8); file.seekp(std::streamoff(segmentSizeAt)); write(length);
         file.flush(); file.close();
     }
+    Writer(const Writer&) = delete;
+    Writer& operator=(const Writer&) = delete;
 };
 }

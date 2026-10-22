@@ -11,9 +11,9 @@ if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
 if (-not $VcpkgRoot -and $env:VCPKG_INSTALLATION_ROOT) { $VcpkgRoot = $env:VCPKG_INSTALLATION_ROOT }
 if (-not $VcpkgRoot) {
     $VcpkgRoot = Join-Path $PSScriptRoot '.deps\vcpkg'
-    if (-not (Test-Path "$VcpkgRoot\scripts\buildsystems\vcpkg.cmake")) {
-        Run 'git' @('clone', '--depth', '1', 'https://github.com/microsoft/vcpkg.git', $VcpkgRoot)
-    }
+}
+if (-not (Test-Path "$VcpkgRoot\scripts\buildsystems\vcpkg.cmake")) {
+    Run 'git' @('clone', 'https://github.com/microsoft/vcpkg.git', $VcpkgRoot)
 }
 if (-not (Test-Path "$VcpkgRoot\vcpkg.exe")) { Run "$VcpkgRoot\bootstrap-vcpkg.bat" @('-disableMetrics') }
 Run 'cmake' @('-S', '.', '-B', 'build', '-A', 'x64', "-DCMAKE_TOOLCHAIN_FILE=$VcpkgRoot\scripts\buildsystems\vcpkg.cmake", '-DVCPKG_TARGET_TRIPLET=x64-windows-static')

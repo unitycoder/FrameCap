@@ -4,5 +4,5 @@
   "dependencies": [
     "libvpx"
   ],
-  "builtin-baseline": "4f973280dd95e3902b3410933fb2ce108bb29d1d"
+  "builtin-baseline": "767ba739506cbb4f50d5778a115fdc8cf0ced297"
 }

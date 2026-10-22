@@ -24,6 +24,8 @@ void convert(const uint8_t* pixels, int width, int height, vpx_image_t& dst) {
 struct Encoder {
     vpx_codec_ctx_t context{}; vpx_image_t image{}; bool initialized = false;
     Encoder(int width, int height, int fps) {
+        if (width <= 0 || height <= 0 || (width & 1) || (height & 1) || fps <= 0)
+            throw std::invalid_argument("Invalid video dimensions or frame rate");
         vpx_codec_enc_cfg_t cfg{};
         if (vpx_codec_enc_config_default(vpx_codec_vp8_cx(), &cfg, 0)) throw std::runtime_error("Cannot configure VP8");
         cfg.g_w = width; cfg.g_h = height; cfg.g_timebase = {1, 1000};
@@ -43,6 +45,8 @@ struct Encoder {
         }
     }
     ~Encoder() { vpx_img_free(&image); if (initialized) vpx_codec_destroy(&context); }
+    Encoder(const Encoder&) = delete;
+    Encoder& operator=(const Encoder&) = delete;
     void encode(webm::Writer& out, vpx_image_t* img, int64_t pts, unsigned long duration) {
         if (vpx_codec_encode(&context, img, pts, duration, 0, VPX_DL_REALTIME))
             throw std::runtime_error(vpx_codec_error(&context));
