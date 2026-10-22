@@ -2,6 +2,8 @@
 
 # FrameCap
 
+<img width="758" height="532" alt="image" src="https://github.com/user-attachments/assets/be4ea9f5-fb81-476a-9c91-607b1668e251" />
+
 A small, native C++ WebM screen recorder for Windows 10/11 x64.
 
 ## Run
