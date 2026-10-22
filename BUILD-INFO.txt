@@ -1,0 +1,15 @@
+Supplied portable binary:
+  Target: Windows x64 GUI application
+  Compiler: MinGW-w64 GCC 13, POSIX threading variant
+  Optimization: -O2, stripped
+  C++ runtime, GCC runtime and threading support: statically linked
+  Video encoder: libvpx 1.15.2, statically linked, VP8 enabled
+  libvpx source: https://github.com/webmproject/libvpx/releases/tag/v1.15.2
+  Windows imports: comdlg32.dll, GDI32.dll, KERNEL32.dll, msvcrt.dll, USER32.dll
+  Requires: Windows 10/11 x64
+
+The source build scripts target MSVC and vcpkg on Windows; the libvpx version
+will be the version in that vcpkg checkout. They rebuild the same application
+source rather than reproducing the supplied MinGW binary byte-for-byte.
+
+See README.md for validation performed and the Windows runtime testing limit.

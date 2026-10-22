@@ -1,0 +1,9 @@
+/build/
+/.deps/
+/dist/
+*.webm
+*.ivf
+.vs/
+out/
+build-vs2026-x64/
+build-local/

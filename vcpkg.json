@@ -1,0 +1,8 @@
+{
+  "name": "framecap",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "libvpx"
+  ],
+  "builtin-baseline": "4f973280dd95e3902b3410933fb2ce108bb29d1d"
+}

@@ -1,0 +1,6 @@
+FrameCap statically links libvpx (WebM Project), under its BSD-style license.
+Source: https://chromium.googlesource.com/webm/libvpx/
+The Windows build script copies the installed libvpx copyright and license
+notices into dist/libvpx-LICENSE.txt. Distribute that file alongside the EXE.
+The portable ZIP includes the notices for its bundled libvpx version.
+No FFmpeg code or executable is included in the application.
