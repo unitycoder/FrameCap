@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/VibeCoded-100%25-green" alt="AI Generated Content"/>
+
 # FrameCap
 
 A small, native C++ WebM screen recorder for Windows 10/11 x64.
