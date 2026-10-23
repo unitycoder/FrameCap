@@ -313,7 +313,7 @@ LRESULT CALLBACK procedure(HWND h, UINT msg, WPARAM w, LPARAM l) {
     case WM_TIMER: InvalidateRect(h, nullptr, FALSE); return 0;
     case WM_ERASEBKGND: return 1;
     case WM_CTLCOLORSTATIC: {
-        HDC dc = HDC(w); SetTextColor(dc, RGB(226, 232, 240)); SetBkColor(dc, RGB(27, 31, 40)); return LRESULT(background);
+        HDC dc = HDC(w); SetTextColor(dc, RGB(226, 232, 240)); SetBkColor(dc, RGB(9, 9, 9)); return LRESULT(background);
     }
     case WM_PAINT: {
         PAINTSTRUCT paint; HDC dc = BeginPaint(h, &paint); RECT r; GetClientRect(h, &r);
@@ -349,7 +349,7 @@ LRESULT CALLBACK procedure(HWND h, UINT msg, WPARAM w, LPARAM l) {
 }
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int show) {
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    background = CreateSolidBrush(RGB(27, 31, 40));
+    background = CreateSolidBrush(RGB(9, 9, 9));
     WNDCLASSEXW cls{}; cls.cbSize = sizeof(cls); cls.lpfnWndProc = procedure; cls.hInstance = instance;
     cls.lpszClassName = L"FrameCap.Main"; cls.hCursor = LoadCursorW(nullptr, IDC_ARROW);
     cls.hIcon = cls.hIconSm = LoadIconW(instance, MAKEINTRESOURCEW(101)); cls.hbrBackground = background;
